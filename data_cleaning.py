@@ -1,7 +1,6 @@
 import os, re, csv
 
 class Problem:
-    pid = 0
     chapter = 0
     question = ""
     a = ""
@@ -77,8 +76,7 @@ with open("output.csv", "w", encoding="utf8", newline='') as outf:
                 
                 elif line_type == "topic":
                     p.topic = line [8:]
-                    outfwriter.writerow([p.pid, p.chapter, p.question, p.a, p.b, p.c, p.d, p.e, p.answer, p.topic, p.figure])
-                    p.pid += 1
+                    outfwriter.writerow([p.chapter, p.question, p.a, p.b, p.c, p.d, p.e, p.answer, p.topic, p.figure])
                 
 
 
