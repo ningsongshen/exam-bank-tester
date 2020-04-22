@@ -1,4 +1,4 @@
-import os, re, csv
+import os, re, csv, sys
 
 class Problem:
     chapter = 0
@@ -11,6 +11,17 @@ class Problem:
     answer = ""
     topic = ""
     figure = False
+
+def resource_path(relative):
+    #print(os.environ)
+    application_path = os.path.abspath(".")
+    if getattr(sys, 'frozen', False):
+        # If the application is run as a bundle, the pyInstaller bootloader
+        # extends the sys module by a flag frozen=True and sets the app 
+        # path into variable _MEIPASS'.
+        application_path = sys._MEIPASS
+    #print(application_path)
+    return os.path.join(application_path, relative)
 
 def get_type(line):
     
@@ -41,9 +52,10 @@ def get_type(line):
 
     return "none"
 
-with open("output.csv", "w", encoding="utf8", newline='') as outf:
+with open(resource_path("output.csv"), "w", encoding="utf8", newline='') as outf:
     outfwriter = csv.writer(outf)
     p = Problem()
+    outfwriter.writerow(["chapter", "question", "a", "b", "c", "d", "e", "answer", "topic", "figure"])
     for filename in os.listdir("banks"):
         print(filename)
         with open("banks/"+filename, "r", encoding="utf8", errors="ignore") as inf:
