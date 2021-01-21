@@ -1,11 +1,13 @@
 # exam-bank-tester
 
-Practice your economics by designing an exam.
+Practice your economics by designing an exam. This program parses the PDF exam banks and creates practice exams for the benefit of Western economics students.
 
-Parses the exam banks and creates practice exams for the benefit of Western economics students.
+## Usage
+
+Download `exam_bank_tester.py` and `output.csv` to a local folder, then run `python exam_bank_tester.py`.
 
 ## To-Do
 
-- Create an html interface with forms to make it more user friendly
+- Graphical user interface for user-friendliness
+- Figure and image mapping/linking
 - Random question mode
-- GUI topic selection

@@ -1,44 +1,83 @@
-# Setting up the data
-import numpy as np 
+from typing import Iterator, List
 import pandas as pd 
 
-data = pd.read_csv("output.csv")
+def get_integer() -> int:
+    done = False
+    while not done:
+        try:
+            num = int(input())
+            return num
+        except ValueError:
+            print("Invalid input, try again.")
+            continue
 
-# Prompting for test characteristics
-done = False
-chapters = []
-print("Enter a chapter to be tested on: ")
-chapters.append(int(input()))
-while not done:
-    print("Enter another chapter to be tested on (or press e to continue): ")
-    try:
-        chapters.append(int(input()))
-    except ValueError:
-        done = True
+def select_chapters() -> List:
+    """Prompt users for chapters to be tested on"""
+    
+    done = False
+    chapters = []
+    print("Enter a chapter to be tested on: ")
+    chapters.append(get_integer())
+    while not done:
+        print("Enter another chapter to be tested on (or press any non-integer to continue): ")
+        try:
+            chapters.append(int(input()))
+        except ValueError:
+            done = True
 
-print("Enter the number of questions to work on: ")
-num_questions = int(input())
+    return chapters
 
-relevant_questions = data[data.chapter.astype(int).isin(chapters)]
+def select_length() -> int:
+    """Prompt users for number of questions to be tested on"""
 
-# remove questions that contain 'figure', because there are no images in this system yet. 
-# Make sure to add this info to the database itself
-ignore_keywords = ["Figure", "Table", "Fact"]
-non_figure_questions = relevant_questions[~relevant_questions.question.str.contains("|".join(ignore_keywords))]
+    print("Enter the number of questions to work on: ")
+    num_questions = get_integer()
+    return num_questions
+    
+def get_questions(filepath: str, chapters: List, num_questions: int) -> pd.DataFrame:
+    data = pd.read_csv(filepath)
+    relevant_questions = data[data.chapter.astype(int).isin(chapters)]
 
-selected_questions = non_figure_questions.sample(n=num_questions, replace=True)
+    # Remove questions that contain 'figure' because there are no images on the command line
+    ignore_keywords = ["Figure", "Table", "Fact"]
+    non_figure_questions = relevant_questions[~relevant_questions.question.str.contains("|".join(ignore_keywords))]
 
-# for testing purposes
-# print(selected_questions.head())
+    selected_questions = non_figure_questions.sample(n=num_questions, replace=True)
 
-for row in selected_questions.itertuples(index=False):
+    return selected_questions
+
+def render_question(row: Iterator) -> None:
     print("", row[1], row[2], row[3], row[4], row[5], row[6], "", sep="\n")
-    response = input()
 
+def evaluate_response(row: Iterator, response: str) -> int:
     if response.upper() == row[7]:
         print("Correct!")
+        return 1
     else:
         print("~~INCORRECT~~")
         print("Answer:", row[7])
-    print("\nPress enter to continue")
-    contine = input()
+        return 0
+
+def main():
+    """Main event loop"""
+    
+    question_data_path = "output.csv"
+    total_points = 0
+
+    selected_chapters = select_chapters()
+    selected_num_questions = select_length()
+
+    selected_question_data = get_questions(question_data_path, selected_chapters, selected_num_questions)
+
+    # Iterate over selected questions
+    for row in selected_question_data.itertuples(index=False):
+        render_question(row)
+        response = input()
+
+        total_points += evaluate_response(row, response)
+        
+        print("\nPress enter to continue")
+        prompt = input()
+
+if __name__ == "__main__":
+    main()
